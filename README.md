@@ -32,6 +32,8 @@ npm run dev
 `.env.local` にはSupabaseの接続情報を設定します。
 Next.js 16では開発サーバーのデフォルトがTurbopackですが、このリポジトリではローカル開発時の安定性を優先して `next dev --webpack` を使います。
 
+Supabase側では、SQL Editorで `web/supabase/schema.sql` を実行して `events` テーブルとRLSポリシーを作成します。
+
 主なコマンド:
 
 ```bash
