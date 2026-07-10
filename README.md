@@ -30,6 +30,7 @@ npm run dev
 ```
 
 `.env.local` にはSupabaseの接続情報を設定します。
+このアプリはServer Components / Route HandlersからSupabaseへ接続するため、環境変数名は `SUPABASE_URL` と `SUPABASE_ANON_KEY` を使います。
 Next.js 16では開発サーバーのデフォルトがTurbopackですが、このリポジトリではローカル開発時の安定性を優先して `next dev --webpack` を使います。
 
 Supabase側では、SQL Editorで `web/supabase/schema.sql` を実行して `events` テーブルとRLSポリシーを作成します。
@@ -45,6 +46,12 @@ npm run build
 ## Android
 
 Android Studioで `android/` ディレクトリを開きます。
+エミュレータからローカル開発サーバーへ送る場合は、デフォルトで `http://10.0.2.2:3000` を使います。
+実機や公開環境から送る場合は、`android/local.properties` にデプロイ済みWebアプリのURLを設定します。
+
+```properties
+EVENT_API_BASE_URL=https://your-deployed-web-app.example.com
+```
 
 コマンドラインでビルドする場合:
 
@@ -52,6 +59,26 @@ Android Studioで `android/` ディレクトリを開きます。
 cd android
 ./gradlew build
 ```
+
+一時的にコマンドラインから送信先を指定する場合:
+
+```bash
+./gradlew assembleDebug -PEVENT_API_BASE_URL=https://your-deployed-web-app.example.com
+```
+
+## デプロイ方針
+
+Next.jsのRoute Handlerを使ってAndroidからのイベントを受けるため、静的ホスティングではなくNext.jsのサーバー機能に対応した環境へデプロイします。
+最小構成ではVercelを推奨します。Next.jsの対応が手厚く、GitHub連携、環境変数、HTTPS、Functionsを少ない設定で使えます。
+
+Vercelで設定する場合:
+
+- Root Directory: `web`
+- Build Command: `npm run build`
+- Output Directory: 未設定
+- Environment Variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+
+Cloudflareで運用する場合は、Cloudflare Pagesの静的Next.jsではなく、OpenNext adapterを使うCloudflare Workers構成を選びます。
 
 ## イベントファネル
 
@@ -73,8 +100,8 @@ cd android
 
 GitHub Actionsでは、Secrets未設定時でもWebのビルド確認だけは通るようにダミー値を使います。実データに接続して確認する場合は、以下のRepository Secretsを設定してください。
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
 ## 注意
 

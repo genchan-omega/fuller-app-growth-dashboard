@@ -224,7 +224,7 @@ suspend fun sendEvent(
     targetId: String? = null,
     metadata: Map<String, Any?> = emptyMap()
 ) {
-    val url = URL("http://10.0.2.2:3000/api/events")
+    val url = URL("${BuildConfig.EVENT_API_BASE_URL}/api/events")
 
     val json = JSONObject().apply {
         put("user_id", "android-user-001")

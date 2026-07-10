@@ -1,7 +1,24 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
+fun eventApiBaseUrl(): String =
+    providers.gradleProperty("EVENT_API_BASE_URL").orNull
+        ?: providers.environmentVariable("EVENT_API_BASE_URL").orNull
+        ?: localProperties.getProperty("EVENT_API_BASE_URL")
+        ?: "http://10.0.2.2:3000"
+
+fun String.toBuildConfigString(): String =
+    "\"${trimEnd('/').replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 android {
     namespace = "com.example.minirecipelogger"
@@ -18,6 +35,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField(
+            "String",
+            "EVENT_API_BASE_URL",
+            eventApiBaseUrl().toBuildConfigString()
+        )
     }
 
     buildTypes {
@@ -38,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
