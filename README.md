@@ -22,6 +22,12 @@ fuller-app-growth-dashboard/
 
 ## Web
 
+公開版はVercelで動作します。
+
+- Production URL: https://fuller-app-growth-dashboard.vercel.app
+
+ローカルで開発する場合:
+
 ```bash
 cd web
 cp .env.example .env.local
@@ -46,11 +52,18 @@ npm run build
 ## Android
 
 Android Studioで `android/` ディレクトリを開きます。
-エミュレータからローカル開発サーバーへ送る場合は、デフォルトで `http://10.0.2.2:3000` を使います。
-実機や公開環境から送る場合は、`android/local.properties` にデプロイ済みWebアプリのURLを設定します。
+デフォルトの送信先はVercel本番APIです。そのため、ローカルで `npm run dev` を立てなくても、実機やエミュレータからイベント送信できます。
+
+デフォルト送信先:
+
+```text
+https://fuller-app-growth-dashboard.vercel.app
+```
+
+別のデプロイ先やローカル開発サーバーへ送る場合だけ、`android/local.properties` にURLを設定します。
 
 ```properties
-EVENT_API_BASE_URL=https://your-deployed-web-app.example.com
+EVENT_API_BASE_URL=https://fuller-app-growth-dashboard.vercel.app
 ```
 
 コマンドラインでビルドする場合:
@@ -63,7 +76,7 @@ cd android
 一時的にコマンドラインから送信先を指定する場合:
 
 ```bash
-./gradlew assembleDebug -PEVENT_API_BASE_URL=https://your-deployed-web-app.example.com
+./gradlew assembleDebug -PEVENT_API_BASE_URL=https://fuller-app-growth-dashboard.vercel.app
 ```
 
 ## デプロイ方針

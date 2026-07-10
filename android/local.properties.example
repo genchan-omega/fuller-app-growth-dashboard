@@ -1,5 +1,5 @@
 sdk.dir=/path/to/Android/sdk
 
-# Optional. Use this when running the Android app against a deployed API.
-# Local emulator development falls back to http://10.0.2.2:3000.
-EVENT_API_BASE_URL=https://your-deployed-web-app.example.com
+# Optional. The committed default points to the Vercel production API.
+# Override this only when you want to target another deployed API or a local dev server.
+EVENT_API_BASE_URL=https://fuller-app-growth-dashboard.vercel.app

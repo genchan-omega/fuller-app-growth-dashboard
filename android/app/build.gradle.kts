@@ -11,11 +11,13 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
+val defaultEventApiBaseUrl = "https://fuller-app-growth-dashboard.vercel.app"
+
 fun eventApiBaseUrl(): String =
     providers.gradleProperty("EVENT_API_BASE_URL").orNull
         ?: providers.environmentVariable("EVENT_API_BASE_URL").orNull
         ?: localProperties.getProperty("EVENT_API_BASE_URL")
-        ?: "http://10.0.2.2:3000"
+        ?: defaultEventApiBaseUrl
 
 fun String.toBuildConfigString(): String =
     "\"${trimEnd('/').replace("\\", "\\\\").replace("\"", "\\\"")}\""
