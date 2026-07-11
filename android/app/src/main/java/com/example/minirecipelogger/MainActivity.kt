@@ -1,5 +1,6 @@
 package com.example.minirecipelogger
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,21 +31,26 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
+
+private const val USER_PREFS_NAME = "mini_recipe_logger_user"
+private const val USER_ID_KEY = "anonymous_user_id"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val userId = getOrCreateAnonymousUserId(applicationContext)
 
         setContent {
             MaterialTheme {
-                MiniRecipeLoggerApp()
+                MiniRecipeLoggerApp(userId = userId)
             }
         }
     }
 }
 
 @Composable
-fun MiniRecipeLoggerApp() {
+fun MiniRecipeLoggerApp(userId: String) {
     val scope = rememberCoroutineScope()
     val statusMessage = remember { mutableStateOf("ログ送信待ち") }
     val searchKeyword = remember { mutableStateOf("") }
@@ -52,6 +58,7 @@ fun MiniRecipeLoggerApp() {
     LaunchedEffect(Unit) {
         try {
             sendEvent(
+                userId = userId,
                 eventName = "app_open",
                 screenName = "home"
             )
@@ -98,6 +105,7 @@ fun MiniRecipeLoggerApp() {
                             scope.launch {
                                 runCatching {
                                     sendEvent(
+                                        userId = userId,
                                         eventName = "recipe_list_view",
                                         screenName = "recipe_list"
                                     )
@@ -118,6 +126,7 @@ fun MiniRecipeLoggerApp() {
                             scope.launch {
                                 runCatching {
                                     sendEvent(
+                                        userId = userId,
                                         eventName = "recipe_detail_view",
                                         screenName = "recipe_detail",
                                         targetId = "recipe-001",
@@ -143,6 +152,7 @@ fun MiniRecipeLoggerApp() {
                             scope.launch {
                                 runCatching {
                                     sendEvent(
+                                        userId = userId,
                                         eventName = "favorite_add",
                                         screenName = "recipe_detail",
                                         targetId = "recipe-001",
@@ -189,6 +199,7 @@ fun MiniRecipeLoggerApp() {
                             scope.launch {
                                 runCatching {
                                     sendEvent(
+                                        userId = userId,
                                         eventName = "recipe_search",
                                         screenName = "search",
                                         metadata = mapOf(
@@ -218,7 +229,24 @@ fun MiniRecipeLoggerApp() {
     }
 }
 
+fun getOrCreateAnonymousUserId(context: Context): String {
+    val preferences = context.getSharedPreferences(USER_PREFS_NAME, Context.MODE_PRIVATE)
+    val existingUserId = preferences.getString(USER_ID_KEY, null)
+
+    if (!existingUserId.isNullOrBlank()) {
+        return existingUserId
+    }
+
+    val createdUserId = "android-user-${UUID.randomUUID()}"
+    preferences.edit()
+        .putString(USER_ID_KEY, createdUserId)
+        .apply()
+
+    return createdUserId
+}
+
 suspend fun sendEvent(
+    userId: String,
     eventName: String,
     screenName: String,
     targetId: String? = null,
@@ -227,7 +255,7 @@ suspend fun sendEvent(
     val url = URL("${BuildConfig.EVENT_API_BASE_URL}/api/events")
 
     val json = JSONObject().apply {
-        put("user_id", "android-user-001")
+        put("user_id", userId)
         put("event_name", eventName)
         put("screen_name", screenName)
         put("target_id", targetId)

@@ -1,7 +1,8 @@
 package com.example.minirecipelogger
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,5 +21,21 @@ class ExampleInstrumentedTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.example.minirecipelogger", appContext.packageName)
+    }
+
+    @Test
+    fun anonymousUserIdPersistsForSameInstall() {
+        val testContext = InstrumentationRegistry.getInstrumentation().context
+        val preferences = testContext.getSharedPreferences(
+            "mini_recipe_logger_user",
+            Context.MODE_PRIVATE
+        )
+        preferences.edit().clear().commit()
+
+        val firstUserId = getOrCreateAnonymousUserId(testContext)
+        val secondUserId = getOrCreateAnonymousUserId(testContext)
+
+        assertTrue(firstUserId.startsWith("android-user-"))
+        assertEquals(firstUserId, secondUserId)
     }
 }

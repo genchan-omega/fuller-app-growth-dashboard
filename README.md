@@ -60,6 +60,9 @@ Android Studioで `android/` ディレクトリを開きます。
 https://fuller-app-growth-dashboard.vercel.app
 ```
 
+`user_id` は初回起動時に匿名UUIDとして生成し、アプリ内のSharedPreferencesに保存します。
+同じスマホでは同じ `user_id` を使い続け、別のスマホでは別の `user_id` が生成されます。
+
 別のデプロイ先やローカル開発サーバーへ送る場合だけ、`android/local.properties` にURLを設定します。
 
 ```properties
